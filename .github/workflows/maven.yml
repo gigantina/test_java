@@ -24,3 +24,7 @@ jobs:
     - name: Build with Maven
       run: mvn -B package
       working-directory: project
+      
+    - name: Run tests with Maven
+      run: mvn test
+      working-directory: project
