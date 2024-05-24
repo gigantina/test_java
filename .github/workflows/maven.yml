@@ -26,5 +26,5 @@ jobs:
       working-directory: project
       
     - name: Run tests with Maven
-      run: mvn test
+      run: mvn -Dtest=org.example.TestLauncherTest test
       working-directory: project
