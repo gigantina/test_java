@@ -16,8 +16,8 @@ public class TestLauncherTest {
         UserService userservice = new UserService();
         assertEquals(150, userservice._sum());
         long t1 = System.nanoTime();
-        System.out.println(t1 - t0);
-        System.out.println((t1 - t0) / 1000000 + "ms");
+        //System.out.println(t1 - t0);
+        System.out.println("Тест на сумму завершился за: " + (t1 - t0) / 1000000 + "ms");
     }
 
     @Test
@@ -26,7 +26,7 @@ public class TestLauncherTest {
         UserService userservice = new UserService();
         assertEquals(5140800, userservice._mult());
         long t1 = System.nanoTime();
-        System.out.println((t1 - t0) / 1000000 + "ms");
+        System.out.println("Тест на умножение завершился за: " + (t1 - t0) / 1000000 + "ms");
     }
 
     @Test
@@ -35,7 +35,7 @@ public class TestLauncherTest {
         UserService userservice = new UserService();
         assertEquals(2, userservice._min());
         long t1 = System.nanoTime();
-        System.out.println((t1 - t0) / 1000000 + "ms");
+        System.out.println("Тест на минимум завершился за: " + (t1 - t0) / 1000000 + "ms");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class TestLauncherTest {
         UserService userservice = new UserService();
         assertEquals(56, userservice._max());
         long t1 = System.nanoTime();
-        System.out.println((t1 - t0) / 1000000 + "ms");
+        System.out.println("Тест на максимум завершился за: " + (t1 - t0) / 1000000 + "ms");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class TestLauncherTest {
         UserService userservice = new UserService();
         assertEquals(2, userservice._mode());
         long t1 = System.nanoTime();
-        System.out.println((t1 - t0) / 1000000 + "ms");
+        System.out.println("Тест на моду завершился за: " + (t1 - t0) / 1000000 + "ms");
     }
 
 }
