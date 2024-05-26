@@ -27,11 +27,13 @@ jobs:
       working-directory: project
       
     - name: Run tests with Maven
-      continue-on-error: true
       id: test
       run: |
+        set +e
         mvn test > result.log 2>&1
-        if [ $? -eq 0 ]; then
+        test_exit_code=$?
+        set -e
+        if [ $test_exit_code -eq 0 ]; then
           echo "success=true" >> $GITHUB_ENV
         else
           echo "success=false" >> $GITHUB_ENV
