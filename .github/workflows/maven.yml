@@ -29,24 +29,19 @@ jobs:
     - name: Run tests with Maven
       id: test
       run: |
-        set +e
         mvn test > result.log 2>&1
-        test_exit_code=$?
-        if [ $test_exit_code -eq 0 ]; then
+        if [ $? -eq 0 ]; then
           echo "success=true" >> $GITHUB_ENV
         else
           echo "success=false" >> $GITHUB_ENV
         fi
-        echo "::set-output name=test_exit_code::$test_exit_code"
       working-directory: project
     
     - name: Send Telegram notification
       if: always()
       run: |
-        test_result=$(cat project/result.log)
         if [ "${{ env.success }}" == "true" ]; then
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все ок"
         else
-          failed_tests=$(grep -A 1 '<<< FAILURE!' project/result.log | grep 'Tests run\|Failures\|Errors')
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты:\n$failed_tests"
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: $(grep -A 1 'Tests run:' project/result.log)"
         fi
