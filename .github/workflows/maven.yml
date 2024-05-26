@@ -24,43 +24,38 @@ jobs:
     - name: Build with Maven
       run: mvn -B package -DskipTests
       working-directory: project
-      continue-on-error: true
 
     - name: Run tests with Maven
       id: test
       run: |
+        set +e
         TEST_OUTPUT=$(mvn test 2>&1)
+        TEST_EXIT_CODE=$?
+        set -e
+
         echo "$TEST_OUTPUT"
-        if echo "$TEST_OUTPUT" | grep -q 'BUILD SUCCESS'; then
+        if [ $TEST_EXIT_CODE -eq 0 ]; then
           echo "success=true" >> $GITHUB_ENV
-          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 10 'Tests run:' | tail -n +2)
-          echo "test_results<<EOF" >> $GITHUB_ENV
-          echo "$TEST_RESULTS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
         else
           echo "success=false" >> $GITHUB_ENV
-          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 10 'Tests run:' | tail -n +2)
-          echo "test_results<<EOF" >> $GITHUB_ENV
-          echo "$TEST_RESULTS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
         fi
+
+        TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 10 'Tests run:' | tail -n +2)
+        echo "test_results<<EOF" >> $GITHUB_ENV
+        echo "$TEST_RESULTS" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
       working-directory: project
-      continue-on-error: true
 
     - name: Debug Environment Variables
       run: |
         echo "Success: ${{ env.success }}"
         echo "Test Results: ${{ env.test_results }}"
-      continue-on-error: true
     
     - name: Send Telegram notification
       if: always()
       run: |
-        echo "Success: ${{ env.success }}"
-        echo "Test Results: ${{ env.test_results }}"
         if [ "${{ env.success }}" == "true" ]; then
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все тесты прошли успешно."
         else
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: ${{ env.test_results }}"
         fi
-      continue-on-error: true
