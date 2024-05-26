@@ -27,8 +27,8 @@ jobs:
       working-directory: project
       
     - name: Run tests with Maven
-      id: test
       continue-on-error: true
+      id: test
       run: |
         mvn test > result.log 2>&1
         if [ $? -eq 0 ]; then
