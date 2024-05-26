@@ -29,8 +29,7 @@ jobs:
     - name: Run tests with Maven
       id: test
       run: |
-        mkdir -p project/logs
-        mvn test > project/logs/result.log 2>&1
+        mvn test | tee project/logs/result.log
         if [ $? -eq 0 ]; then
           echo "success=true" >> $GITHUB_ENV
         else
@@ -45,5 +44,8 @@ jobs:
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все ок"
         else
           TEST_RESULTS=$(grep -A 1 'Tests run:' project/logs/result.log || echo "No test summary found")
+          if [ "$TEST_RESULTS" == "No test summary found" ]; then
+            TEST_RESULTS=$(tail -n 20 project/logs/result.log)
+          fi
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: $TEST_RESULTS"
         fi
