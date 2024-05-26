@@ -21,7 +21,7 @@
 
 
 ## График зависимости времени от количества чисел в файле на примере функции _summ
-![График](https://github.com/gigantina/test_java/image.png)
+![График](https://github.com/gigantina/test_java/blob/origin/image.png)
 
 
 ## CI/CD
