@@ -29,27 +29,24 @@ jobs:
     - name: Run tests with Maven
       id: test
       run: |
-        set +e
         TEST_OUTPUT=$(mvn test 2>&1)
         echo "$TEST_OUTPUT"
         if echo "$TEST_OUTPUT" | grep -q 'BUILD SUCCESS'; then
-          echo "success=true" >> $GITHUB_ENV
+          echo "::set-output name=success::true"
         else
-          echo "success=false" >> $GITHUB_ENV
+          echo "::set-output name=success::false"
           TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 1 'Tests run:' || echo "No test summary found")
-          echo "test_results<<EOF" >> $GITHUB_ENV
-          echo "$TEST_RESULTS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "::set-output name=test_results::$TEST_RESULTS"
         fi
       working-directory: project
     
     - name: Send Telegram notification
       if: always()
       run: |
-        echo "Success: ${{ env.success }}"
-        echo "Test Results: ${{ env.test_results }}"
-        if [ "${{ env.success }}" == "true" ]; then
+        echo "Success: ${{ steps.test.outputs.success }}"
+        echo "Test Results: ${{ steps.test.outputs.test_results }}"
+        if [ "${{ steps.test.outputs.success }}" == "true" ]; then
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все ок"
         else
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: ${{ env.test_results }}"
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: ${{ steps.test.outputs.test_results }}"
         fi
