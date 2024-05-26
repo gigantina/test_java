@@ -38,9 +38,10 @@ jobs:
       working-directory: project
     
     - name: Send Telegram notification
-      if: success() || failure()
+      if: always()
       run: |
         if [ "${{ env.success }}" == "true" ]; then
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все ок"
         else
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: $(grep -A 1 'Tests run:' project/result.log)"
+        fi
