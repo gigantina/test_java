@@ -55,7 +55,7 @@ jobs:
       if: always()
       run: |
         if [ "${{ env.success }}" == "true" ]; then
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все тесты прошли успешно"
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d parse_mode="Markdown" -d text="**Все тесты прошли успешно**"
         else
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Что-то пошло не так: ${{ env.test_results }}"
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d parse_mode="Markdown" -d text="**Что-то пошло не так:**\n${{ env.test_results }}"
         fi
