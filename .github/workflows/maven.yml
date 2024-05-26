@@ -26,21 +26,24 @@ jobs:
       run: mvn -B package
       working-directory: project
       continue-on-error: true
-      
+
     - name: Run tests with Maven
       id: test
       run: |
-        TEST_OUTPUT=$(mvn test 2>&1 | tee /dev/tty)
+        TEST_OUTPUT=$(mvn test 2>&1)
+        echo "$TEST_OUTPUT"
         if echo "$TEST_OUTPUT" | grep -q 'BUILD SUCCESS'; then
           echo "success=true" >> $GITHUB_ENV
         else
           echo "success=false" >> $GITHUB_ENV
-          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 5 'Tests run:' | tail -n +2)
-          echo "test_results=$TEST_RESULTS" >> $GITHUB_ENV
+          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 10 'Tests run:' | tail -n +2)
+          echo "test_results<<EOF" >> $GITHUB_ENV
+          echo "$TEST_RESULTS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         fi
       working-directory: project
       continue-on-error: true
-    
+
     - name: Debug Environment Variables
       run: |
         echo "Success: ${{ env.success }}"
