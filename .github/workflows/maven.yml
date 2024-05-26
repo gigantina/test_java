@@ -30,13 +30,12 @@ jobs:
     - name: Run tests with Maven
       id: test
       run: |
-        TEST_OUTPUT=$(mvn test 2>&1)
-        echo "$TEST_OUTPUT"
+        TEST_OUTPUT=$(mvn test 2>&1 | tee /dev/tty)
         if echo "$TEST_OUTPUT" | grep -q 'BUILD SUCCESS'; then
           echo "success=true" >> $GITHUB_ENV
         else
           echo "success=false" >> $GITHUB_ENV
-          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 1 'Tests run:' || echo "No test summary found")
+          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 5 'Tests run:' | tail -n +2)
           echo "test_results=$TEST_RESULTS" >> $GITHUB_ENV
         fi
       working-directory: project
