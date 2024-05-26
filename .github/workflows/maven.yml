@@ -29,11 +29,14 @@ jobs:
     - name: Run tests with Maven
       id: test
       run: |
-        mvn test | tee project/logs/result.log
-        if [ $? -eq 0 ]; then
+        TEST_OUTPUT=$(mvn test 2>&1)
+        echo "$TEST_OUTPUT"
+        if echo "$TEST_OUTPUT" | grep -q 'BUILD SUCCESS'; then
           echo "success=true" >> $GITHUB_ENV
         else
           echo "success=false" >> $GITHUB_ENV
+          TEST_RESULTS=$(echo "$TEST_OUTPUT" | grep -A 1 'Tests run:' || echo "No test summary found")
+          echo "test_results=$TEST_RESULTS" >> $GITHUB_ENV
         fi
       working-directory: project
     
@@ -43,9 +46,5 @@ jobs:
         if [ "${{ env.success }}" == "true" ]; then
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Все ок"
         else
-          TEST_RESULTS=$(grep -A 1 'Tests run:' project/logs/result.log || echo "No test summary found")
-          if [ "$TEST_RESULTS" == "No test summary found" ]; then
-            TEST_RESULTS=$(tail -n 20 project/logs/result.log)
-          fi
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: $TEST_RESULTS"
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} -d text="Не пройдены следующие тесты: ${{ env.test_results }}"
         fi
