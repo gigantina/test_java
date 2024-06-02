@@ -17,7 +17,7 @@ public class TestLauncherTest {
         long time = sumResult[1];
 
         assertAll("Проверка суммы",
-                () -> assertEquals(151, sum, "Тест не пройден. Ожидалось: 150, но было: " + sum)
+                () -> assertEquals(150, sum, "Тест не пройден. Ожидалось: 150, но было: " + sum)
         );
 
         System.out.println("Тест на сумму завершился за: " + time + "ns");
