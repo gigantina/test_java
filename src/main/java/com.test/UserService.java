@@ -1,6 +1,7 @@
 package com.test;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -11,50 +12,63 @@ public class UserService {
     long[] numbers;
 
     public UserService() throws IOException {
-        BufferedReader sc = new BufferedReader(new FileReader("input.txt"));
-        String[] numbersString = sc.readLine().split(" ");
-        numbers = Arrays.stream(numbersString)
+        numbers = Arrays.stream(readFile())
                 .mapToLong(Long::parseLong)
                 .toArray();
     }
 
-    public long _min() {
-        long res = 9223372036854775807L;
-        for (int i = 0; i < numbers.length; i++) {
-            if (numbers[i] < res) {
-                res = numbers[i];
-            }
-        }
-        return res;
+    public String[] readFile() throws IOException {
+        BufferedReader sc = new BufferedReader(new FileReader("input.txt"));
+        String[] numbersString = sc.readLine().split(" ");
+        return numbersString;
     }
 
-    public long _max() {
-        long res = -9223372036854775807L;
+    public long[] _min() {
+        long t0 = System.nanoTime();
+        long min = Long.MAX_VALUE;
+        for (int i = 0; i < numbers.length; i++) {
+            if (numbers[i] < min) {
+                min = numbers[i];
+            }
+        }
+        long t1 = System.nanoTime();
+        return new long[]{min, t1 - t0};
+    }
+
+    public long[] _max() {
+        long t0 = System.nanoTime();
+        long res = Long.MIN_VALUE;
         for (int i = 0; i < numbers.length; i++) {
             if (numbers[i] > res) {
                 res = numbers[i];
             }
         }
-        return res;
+        long t1 = System.nanoTime();
+        return new long[]{res, t1 - t0};
     }
 
-    public long _sum() {
-        long res = 0;
+    public long[] _sum() throws ArithmeticException {
+        long t0 = System.nanoTime();
+        long sum = 0;
         for (int i = 0; i < numbers.length; i++) {
-            res += numbers[i];
+            sum = Math.addExact(sum, numbers[i]);
         }
-        return res;
+        long t1 = System.nanoTime();
+        return new long[]{sum, t1 - t0};
     }
 
-    public long _mult() {
-        long res = 1;
+    public long[] _mult() {
+        long t0 = System.nanoTime();
+        long mult = 1;
         for (int i = 0; i < numbers.length; i++) {
-            res *= numbers[i];
+            mult = Math.multiplyExact(mult, numbers[i]);
         }
-        return res;
+        long t1 = System.nanoTime();
+        return new long[]{mult, t1 - t0};
     }
 
-    public long _mode() {
+    public long[] _mode() {
+        long t0 = System.nanoTime();
         Map<Long, Integer> frequencyMap = new HashMap<>();
         int maxFrequency = 0;
         long mode = Long.MAX_VALUE;
@@ -71,7 +85,8 @@ public class UserService {
                 }
             }
         }
-        return mode;
+        long t1 = System.nanoTime();
+        return new long[]{mode, t1 - t0};
     }
 
 }
